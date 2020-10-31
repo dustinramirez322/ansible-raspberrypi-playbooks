@@ -1,0 +1,16 @@
+---
+- name: check if system requires a restart
+  hosts: pis
+
+  tasks:
+
+  - name: check for /var/run/reboot-required file
+    stat:
+      path: /var/run/reboot-required
+    register: stat_result
+# Remove this debug if you don't care about seeing what hosts don't need a reboot
+  - debug: msg="No restart required for {{ inventory_hostname }}"
+    when: stat_result.stat.exists == False
+
+  - debug: msg="A restart is required for {{ inventory_hostname }}"
+    when: stat_result.stat.exists == True
