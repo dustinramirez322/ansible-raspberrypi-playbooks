@@ -1,7 +1,7 @@
 # ansible-raspberrypi-playbooks
 These are playbooks I use in to manage raspberry pi and other single board computers.
 
-They are being executed from a Raspberry Pi 3B+ running Fedora 32.
+They are being executed from a Raspberry Pi 3B+ running Fedora 34.
 
 These have been tested against raspberry pis running several different OSs as well as against the rock pi-s single board computer running debian based OSs.
 
