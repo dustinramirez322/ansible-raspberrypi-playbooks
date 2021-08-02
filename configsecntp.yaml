@@ -1,0 +1,45 @@
+---
+#Replace <hosts> with appropriate information for your environment
+#Replace <key> with appropriate key for your environment
+#Replace <ip> with ntp server that is currently not configured with sec ntp
+- hosts: <hosts>
+  tasks:
+  
+  - name: Create ntp directory
+    file:
+      path: "/etc/ntp"
+      state: directory
+    become: yes
+    
+  - name: Create /etc/ntp/keys
+    copy:
+      dest: "/etc/ntp/keys"
+      content: |
+        #NTP Keys
+        1 M <key> #Pi53
+    become: yes  
+
+  - name: Append information to keys filer
+    blockinfile:
+      path: "/etc/ntp.conf"
+      block: |
+        keys /etc/ntp/keys
+        trustedkey 1
+        controlkey 1
+        requestkey 1
+    become: yes
+
+  - name: Replace server with server + key
+    ansible.builtin.replace:
+      path: "/etc/ntp.conf"
+      regexp: 'server <ip>?$'
+      replace: 'server <ip> key 1'
+    become: yes
+
+
+  - name: Restart ntp
+    ansible.builtin.systemd:
+      state: restarted
+      daemon_reload: yes
+      name: ntp
+    become: yes
