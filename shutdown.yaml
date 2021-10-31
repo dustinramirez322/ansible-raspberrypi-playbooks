@@ -1,0 +1,30 @@
+---
+- name: shutdown hosts
+  hosts: linux,!localhost
+  become: true
+  become_method: sudo
+  vars_prompt:
+    - name: ask_for_shutdown
+      prompt: Are you sure you want to shutdown? (y/n)
+      private: no
+
+  tasks:
+
+  - name: Shutdown the host in 30 seconds
+    community.general.shutdown:
+      delay: 30
+    when: ask_for_shutdown == 'y'
+
+  - wait_for: host={{ inventory_hostname }}  port=22 timeout=1
+    register: host_check
+    ignore_unreachable: yes
+
+  - name: determine if online
+    set_fact:
+      online: "{{ host_check | json_query('failed') }}"
+    ignore_unreachable: yes
+
+  - name: Print online response
+    debug: msg="Warning! {{ inventory_hostname }} is still online!"
+    when: online == false
+    ignore_unreachable: yes
