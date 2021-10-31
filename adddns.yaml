@@ -1,0 +1,26 @@
+---
+
+- hosts: pi-53,pi-153
+  vars_prompt:
+    - name: IP
+      prompt: What IP address would you like added?
+      private: no
+    - name: HOSTNAME
+      prompt: What Hostname would you like added
+      private: no
+
+
+  tasks:
+  
+  - name: Append DNS entry based off input variables
+    lineinfile:
+      path: "/etc/hosts"
+      line: "{{ IP }} {{ HOSTNAME }} #Added by Ansible"
+    become: yes
+
+  - name: Restart dnsmasq
+    ansible.builtin.systemd:
+      state: restarted
+      daemon_reload: yes
+      name: dnsmasq
+    become: yes
